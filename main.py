@@ -1,10 +1,12 @@
 """Punto de entrada: descarga los Form 4 de un ticker y guarda un CSV."""
 import argparse
+import webbrowser
 from pathlib import Path
 
 import pandas as pd
 
 from parser_form4 import parsear_form4
+from reporte import generar_html
 from sec_api import ClienteSEC, listar_form4, ticker_a_cik
 
 CARPETA_SALIDA = Path("output")
@@ -74,8 +76,13 @@ def main():
     ruta = CARPETA_SALIDA / f"insiders_{ticker}.csv"
     df.to_csv(ruta, index=False, encoding="utf-8-sig")
 
+    ruta_html = CARPETA_SALIDA / f"reporte_{ticker}.html"
+    generar_html(df, ticker, empresa, ruta_html)
+
     resumen(df)
-    print(f"\nGuardado en {ruta}")
+    print(f"\nGuardado en {ruta} y {ruta_html}")
+
+    webbrowser.open(ruta_html.resolve().as_uri())
 
 
 if __name__ == "__main__":
